@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="bizscore" basedir="." default="usage">
+	<property file="build.properties" />
+	<property name="src.dir" value="src" />
+	<property name="lib.dir" value="lib" />
+	<property name="web.dir" value="web" />
+	<property name="build.dir" value="${web.dir}/WEB-INF/classes" />
+	<property name="log.dir" value="${web.dir}/logs" />
+	<property name="conf.dir" value="conf" />
+	<property name="javadoc.dir" value="docs" />
+	<property name="name" value="bizscore" />
+
+	<path id="master-classpath">
+		<fileset dir="${lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+		<!-- We need the servlet API classes:        -->
+		<!--   for Tomcat 4.1 use servlet.jar        -->
+		<!--   for Tomcat 5.0 use servlet-api.jar    -->
+		<!--   for Other app server - check the docs -->
+		<fileset dir="${appserver.home}/lib">
+			<include name="servlet-api.jar" />
+			<include name="jsp-api.jar" />
+		</fileset>
+		<pathelement path="${build.dir}" />
+	</path>
+
+	<!-- ***************************************Common******************************************* -->
+	<target name="usage">
+		<echo message="" />
+		<echo message="${name} build file" />
+		<echo message="-----------------------------------" />
+		<echo message="" />
+		<echo message="Available targets are:" />
+		<echo message="" />
+		<echo message="build     --> Build the application" />
+		<echo message="deploy    --> Deploy application as directory" />
+		<echo message="compile   --> Compile the application" />
+		<echo message="" />
+	</target>
+
+	<target name="clean" description="Clean output directories">
+		<delete includeemptydirs="true">
+			<fileset dir="${web.dir}">
+				<include name="**/**" />
+			</fileset>
+		</delete>
+	</target>
+
+	<target name="build dist" >
+		<mkdir dir="${web.dir}/images" />
+		<mkdir dir="${web.dir}/style" />
+		<mkdir dir="${web.dir}/js" />
+		<mkdir dir="${web.dir}/logs" />
+		<mkdir dir="${web.dir}/licenses" />
+		<mkdir dir="${web.dir}/swf" />
+		<mkdir dir="${web.dir}/help" />
+
+		<copy todir="${web.dir}/images" preservelastmodified="true">
+			<fileset dir="images">
+				<include name="**/*.*" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/style" preservelastmodified="true">
+			<fileset dir="style">
+				<include name="**/*.*" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/js" preservelastmodified="true">
+			<fileset dir="js">
+				<include name="**/*.*" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/licenses" preservelastmodified="true">
+			<fileset dir="licenses">
+				<include name="**/*.*" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+
+		<copy todir="${web.dir}/help" preservelastmodified="true">
+			<fileset dir="help">
+				<include name="**/*.*" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/staticfiles" preservelastmodified="true">
+			<fileset dir="staticfiles">
+				<include name="**/*.*" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+
+		<!--<copy todir="${build.dir}" preservelastmodified="true">
+			<fileset dir="${conf.dir}">
+				<include name="**/*.*"/>
+				<exclude name ="web/**"/>
+				<exclude name=".svn/**"/>
+			</fileset>
+		</copy>-->
+		<copy todir="${web.dir}/WEB-INF/lib" preservelastmodified="true">
+			<fileset dir="${lib.dir}">
+				<include name="**/**" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+
+		<copy todir="${web.dir}/WEB-INF/classes" preservelastmodified="true">
+			<fileset dir="${src.dir}">
+				<include name="**/**" />
+				<exclude name=".svn/**" />
+				<exclude name="**/*.java"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="compile-all" description="Compile main source tree java files">
+		<mkdir dir="${build.dir}" />
+		<javac destdir="${build.dir}" target="1.6" debug="true" deprecation="false" optimize="false" failonerror="true">
+			<src path="${src.dir}" />
+			<exclude name=".svn/**" />
+			<classpath refid="master-classpath" />
+		</javac>
+	</target>
+
+	<target name="deploy-all" depends="compile-all,build dist,build dist all" description="Deploy application">
+		<copy todir="${deploy.path}/${name}" preservelastmodified="true">
+			<fileset dir="${web.dir}">
+				<include name="**/**" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="build dist all" >
+		<copy todir="${web.dir}/WEB-INF/jsp" preservelastmodified="true">
+			<fileset dir="jsp">
+				<include name="**/**" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/swf" preservelastmodified="true">
+			<fileset dir="swf">
+				<include name="**/*.*" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/WEB-INF" preservelastmodified="true">
+			<fileset dir="${conf.dir}/web">
+				<include name="**/*.*" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/WEB-INF/classes" preservelastmodified="true">
+			<fileset dir="${conf.dir}">
+				<include name="*.*" />
+				<include name="META-INF/**" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+	</target>
+	<!-- ***************************************Common******************************************* -->
+
+	<!-- ***************************************Platform******************************************* -->
+	<target name="compile-platform" description="Compile platform java files">
+		<mkdir dir="${build.dir}" />
+		<javac destdir="${build.dir}" target="1.6" debug="true" deprecation="false" optimize="false" failonerror="true">
+			<src path="${src.dir}/com/" />
+			<include name="icreate/platform/**" />
+			<include name="icreate/microstrategy/**" />
+			<classpath refid="master-classpath" />
+		</javac>
+	</target>
+	<target name="deploy-platform" depends="compile-platform,build dist,build dist platform" description="Deploy platform">
+		<copy todir="${deploy.path}/${name}" preservelastmodified="true">
+			<fileset dir="${web.dir}">
+				<include name="**/**" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="build dist platform" >
+		<copy todir="${web.dir}/WEB-INF/jsp" preservelastmodified="true">
+			<fileset dir="jsp">
+				<include name="platform/**" />
+				<include name="microstrategy/**" />
+				<include name="index.jsp" />
+				<include name="default.jsp" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/swf" preservelastmodified="true">
+			<fileset dir="swf">
+				<include name="platform/**" />
+				<include name="microstrategy/**" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/WEB-INF" preservelastmodified="true">
+			<fileset dir="${conf.dir}/web">
+				<include name="**/*.*" />
+				<exclude name="strategyContext.xml" />
+				<exclude name="**/modules-*.*" />
+				<exclude name="**/businesssolutions-*.*" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/WEB-INF/classes" preservelastmodified="true">
+			<fileset dir="${conf.dir}">
+				<include name="*.*" />
+				<exclude name="modules-*.*" />
+				<exclude name="businesssolutions-*.*" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- ***************************************Platform******************************************* -->
+
+
+
+	<!-- ***************************************Business Solutions******************************************* -->
+
+	<target name="compile-businesssolutions" depends="compile-platform" description="Compile businesssolutions java files">
+		<mkdir dir="${build.dir}" />
+		<javac destdir="${build.dir}" target="1.6" debug="true" deprecation="false" optimize="false" failonerror="true">
+			<src path="${src.dir}/com/icreate/" />
+			<include name="businesssolutions/**" />
+			<classpath refid="master-classpath" />
+		</javac>
+	</target>
+
+	<target name="deploy-businesssolutions" depends="compile-businesssolutions,build dist,build dist business solutions" description="Deploy business solutions">
+		<copy todir="${deploy.path}/${name}" preservelastmodified="true">
+			<fileset dir="${web.dir}">
+				<include name="**/**" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="build dist business solutions" depends="build dist platform" >
+		<copy todir="${web.dir}/WEB-INF/jsp" preservelastmodified="true">
+			<fileset dir="jsp">
+				<include name="businesssolutions/**" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/swf" preservelastmodified="true">
+			<fileset dir="swf">
+				<include name="businesssolutions/**" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/WEB-INF" preservelastmodified="true">
+			<fileset dir="${conf.dir}/web">
+				<include name="**/businesssolutions-*.*" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/WEB-INF/classes" preservelastmodified="true">
+			<fileset dir="${conf.dir}">
+				<include name="businesssolutions-*.*" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+	</target>
+	<!-- ***************************************Business Solutions******************************************* -->
+
+	<!-- ***************************************Modules-statementrequest******************************************* -->
+	<target name="compile-modules-statementrequest" depends="compile-platform" description="Statement request module">
+		<mkdir dir="${build.dir}" />
+		<javac destdir="${build.dir}" target="1.6" debug="true" deprecation="false" optimize="false" failonerror="true">
+			<src path="${src.dir}/com/icreate/" />
+			<include name="modules/statementrequest/**" />
+			<include name="modules/common/**" />
+			<include name="modules/utils/**" />
+			<classpath refid="master-classpath" />
+		</javac>
+	</target>
+	<target name="deploy-modules-statementrequest" depends="compile-modules-statementrequest,build dist,build-dist-modules-statementrequest" description="Deploy modules">
+		<copy todir="${deploy.path}/${name}" preservelastmodified="true">
+			<fileset dir="${web.dir}">
+				<include name="**/**" />
+			</fileset>
+		</copy>
+	</target>
+	<target name="build-dist-modules-statementrequest" depends="build dist platform" >
+		<copy todir="${web.dir}/WEB-INF/jsp" preservelastmodified="true">
+			<fileset dir="jsp">
+				<include name="modules/statementrequest/**" />
+				<include name="modules/common/**" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/swf" preservelastmodified="true">
+			<fileset dir="swf">
+				<include name="modules/statementrequest/**" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/WEB-INF" preservelastmodified="true">
+			<fileset dir="${conf.dir}/web">
+				<include name="**/modules-statementrequest*.*" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/WEB-INF/classes" preservelastmodified="true">
+			<fileset dir="${conf.dir}">
+				<include name="modules-statementrequest*.*" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+	</target>
+	<!-- ***************************************Modules-statementrequest******************************************* -->
+
+	<!-- ***************************************Modules-Content publishing******************************************* -->
+	<target name="compile-modules-contentpublishing" depends="compile-platform" description="Content publishing module">
+		<mkdir dir="${build.dir}" />
+		<javac destdir="${build.dir}" target="1.6" debug="true" deprecation="false" optimize="false" failonerror="true">
+			<src path="${src.dir}/com/icreate/" />
+			<include name="modules/contentpublishing/**" />
+			<include name="modules/common/**" />
+			<include name="modules/utils/**" />
+			<classpath refid="master-classpath" />
+		</javac>
+	</target>
+
+	<target name="deploy-modules-contentpublishing" depends="compile-modules-contentpublishing,build dist,build-dist-modules-contentpublishing" description="Deploy modules">
+		<copy todir="${deploy.path}/${name}" preservelastmodified="true">
+			<fileset dir="${web.dir}">
+				<include name="**/**" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="build-dist-modules-contentpublishing" depends="build dist platform" >
+		<copy todir="${web.dir}/WEB-INF/jsp" preservelastmodified="true">
+			<fileset dir="jsp">
+				<include name="modules/contentpublishing/**" />
+				<include name="modules/common/**" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/swf" preservelastmodified="true">
+			<fileset dir="swf">
+				<include name="modules/contentpublishing/**" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/WEB-INF" preservelastmodified="true">
+			<fileset dir="${conf.dir}/web">
+				<include name="**/modules-contentpublishing*.*" />
+				<include name="strategyContext.xml" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/WEB-INF/classes" preservelastmodified="true">
+			<fileset dir="${conf.dir}">
+				<include name="modules-contentpublishing*.*" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+	</target>
+	<!-- ***************************************Modules-Content publishing******************************************* -->
+	<!-- ***************************************Modules-Performance management******************************************* -->
+	<target name="compile-modules-performancemanagement" depends="compile-platform" description="Performance management module">
+		<mkdir dir="${build.dir}" />
+		<javac destdir="${build.dir}" target="1.6" debug="true" deprecation="false" optimize="false" failonerror="true">
+			<src path="${src.dir}/com/icreate/" />
+			<include name="modules/performancemanagement/**" />
+			<include name="modules/common/**" />
+			<include name="modules/utils/**" />
+			<classpath refid="master-classpath" />
+		</javac>
+	</target>
+
+
+	<target name="deploy-modules-performancemanagement" depends="compile-modules-performancemanagement,build dist,build-dist-modules-performancemanagement" description="Deploy modules">
+		<copy todir="${deploy.path}/${name}" preservelastmodified="true">
+			<fileset dir="${web.dir}">
+				<include name="**/**" />
+			</fileset>
+		</copy>
+	</target>
+
+
+
+	<target name="build-dist-modules-performancemanagement" depends="build dist platform" >
+		<copy todir="${web.dir}/WEB-INF/jsp" preservelastmodified="true">
+			<fileset dir="jsp">
+				<include name="modules/performancemanagement/**" />
+				<include name="modules/common/**" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/swf" preservelastmodified="true">
+			<fileset dir="swf">
+				<include name="modules/performancemanagement/**" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/WEB-INF" preservelastmodified="true">
+			<fileset dir="${conf.dir}/web">
+				<include name="**/modules-performancemanagement*.*" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+		<copy todir="${web.dir}/WEB-INF/classes" preservelastmodified="true">
+			<fileset dir="${conf.dir}">
+				<include name="modules-performancemanagement*.*" />
+				<exclude name=".svn/**" />
+			</fileset>
+		</copy>
+	</target>
+	<!-- ***************************************Modules-Performance management******************************************* -->
+	
+	<!--****************************************Without indus ind******************************************************** -->
+	<target name="build dist_withoutIndusInd" >
+			<copy todir="${web.dir}/WEB-INF/jsp" preservelastmodified="true">
+				<fileset dir="jsp">
+					<include name="**/**" />
+					<exclude name=".svn/**" />
+				</fileset>
+			</copy>
+			<copy todir="${web.dir}/swf" preservelastmodified="true">
+				<fileset dir="swf">
+					<include name="**/*.*" />
+					<exclude name=".svn/**" />
+				</fileset>
+			</copy>
+			<copy todir="${web.dir}/WEB-INF" preservelastmodified="true">
+				<fileset dir="${conf.dir}/web">
+					<include name="**/*.*" />
+					<exclude name=".svn/**" />
+					<exclude name="**/modules-gapdatamanagement-indusindmart-*.xml" />
+				</fileset>
+			</copy>
+			<copy todir="${web.dir}/WEB-INF/classes" preservelastmodified="true">
+				<fileset dir="${conf.dir}">
+					<include name="*.*" />
+					<exclude name=".svn/**" />
+					<exclude name="**/modules-gapdatamanagement-indusindmart*.xml" />
+				</fileset>
+			</copy>
+	</target>
+	
+	<target name="deploy-withoutindusind" depends="compile-all,build dist,build dist_withoutIndusInd" description="Deploy application">
+			<copy todir="${deploy.path}/${name}" preservelastmodified="true">
+				<fileset dir="${web.dir}">
+					<include name="**/**" />
+				</fileset>
+			</copy>
+	</target>	
+	
+	<!--****************************************Without indus ind******************************************************** -->
+
+</project>

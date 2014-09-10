@@ -1,0 +1,45 @@
+<html>
+
+<head>
+	<link rel="stylesheet" href="js/extjs/resources/css/ext-all-gray.css"/>
+	<link rel="stylesheet" href="main.css"/>
+	<script type="text/javascript" src="/IFarmMonitor/js/extjs/ext-all.js"></script>
+	<script type="text/javascript" src="js/jquery1.8.2.min.js"></script>
+	<script type="text/javascript" src="/IFarmMonitor/js/modules/space/functions.js" ></script>	
+	<script type="text/javascript" src="/IFarmMonitor/js/modules/stuckjobs/definitions.js" ></script>
+	<script type="text/javascript" src="/IFarmMonitor/js/modules/stuckjobs/datastores.js" ></script>
+	<script type="text/javascript" src="/IFarmMonitor/js/modules/stuckjobs/functions.js" ></script>
+	<script type="text/javascript" src="/IFarmMonitor/js/modules/killedjobs/definitions.js" ></script>
+	<script type="text/javascript" src="/IFarmMonitor/js/modules/killedjobs/datastores.js" ></script>
+	<script type="text/javascript" src="/IFarmMonitor/js/modules/killedjobs/functions.js" ></script>
+	<script type="text/javascript" src="/IFarmMonitor/js/modules/resourceusage/definitions.js" ></script>
+	<script type="text/javascript" src="/IFarmMonitor/js/modules/resourceusage/datastores.js" ></script>
+	<script type="text/javascript" src="/IFarmMonitor/js/modules/resourceusage/functions.js" ></script>		
+	<title>IFarmMonitor</title>
+</head>
+
+<body onload="startup()">
+	<script src="/IFarmMonitor/js/highcharts.js"></script>
+	<script src="/IFarmMonitor/js/exporting.js"></script>
+	
+	<form id="IfarmMonitoringForm">
+		<table height="50" width="100%" border="0">
+			<tr>
+				<td width="160"><b>&nbsp&nbspSelect Category: </b></td>			
+				<td valign="center" halign="left" width="40%">					
+					<div id="categoryList">Loading ..</div>
+				</td>
+				
+				<td>
+					<input type="button" name="submit" value="Submit" onclick="submitForm()"/> &nbsp; &nbsp;
+					<input type="reset" name="cancel" value="Cancel" onclick="clearContentPane()" />
+				</td>
+			</tr>
+		</table>	
+		<hr>
+	</form>
+	
+	<div id="contentPane" style="min-width: 310px; min-height: 400px; margin: 0 auto"></div>
+</body>
+
+</html>
