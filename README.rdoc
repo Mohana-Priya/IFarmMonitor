@@ -1,0 +1,6 @@
+This repository is created to hold source code for IFARMMonitor project done by me at Oracle.
+
+1)download the repository
+2)import it as a project to eclipse
+3)use build.xml as ant file and give correct configuration in build.properties and do deploy all
+4)start tomcat and access application using "localhost:8080/IFarmMonitor/"
